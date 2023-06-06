@@ -8,26 +8,12 @@ with open("phonebook_raw.csv", encoding='utf-8') as f:
 
 def put_in_order():
     '''Функция подготовки ФИО для дальнейшей обработки'''
-    contacts = contacts_list
-    for content in contacts:
-        content[0] = content[0].split(' ')
-        content[1] = content[1].split(' ')
-        if len(content[0]) == 3:
-            content[2] = content[0][2]
-            content[1] = content[0][1]
-            content[0] = content[0][0]
-        if len(content[0]) == 2:
-            content[1] = content[0][1]
-            content[0] = content[0][0]
-        if len(content[0]) == 1:
-            content[0] = content[0][0]
-        if len(content[1]) == 2:
-            content[2] = content[1][1]
-            content[1] = content[1][0]
-        if len(content[1]) == 1:
-            content[1] = content[1][0]
+    contacts = []
+    for data in contacts_list:
+        split_data = ' '.join(data[:3]).split(' ')
+        contacts.append([split_data[0], split_data[1], split_data[2], data[3], data[4], data[5], data[6]])
     return contacts
-
+put_in_order()
 
 def phone_numbers():
     '''Функция поиска и приведения к единому стандарту тф номеров'''
@@ -38,14 +24,15 @@ def phone_numbers():
         res = re.sub(pattern, new_phone_num, number[5])
         number[5] = res
     return contacts
-
+phone_numbers()
 
 def list_for_load():
     '''Функция очистки списка от повторяющихся значений'''
-    for info in phone_numbers():
+    contacts = phone_numbers()
+    for info in contacts:
         last_name = info[0]
         name = info[1]
-        for new_info in phone_numbers():
+        for new_info in contacts:
             new_last_name = new_info[0]
             new_name = new_info[1]
             if last_name == new_last_name and name == new_name:
@@ -60,14 +47,17 @@ def list_for_load():
                 if info[6] == '':
                     info[6] = new_info[6]
     ready_contact_list = []
-    for data in phone_numbers():
+    for data in contacts:
         if data not in ready_contact_list:
             ready_contact_list.append(data)
     return ready_contact_list
 
 
 if __name__ == '__main__':
-    list_for_load()
+    put_in_order()
+    phone_numbers()
+    pprint(list_for_load())
+
 
 with open("phonebook.csv", "w", encoding="utf-8") as f:
     datawriter = csv.writer(f, delimiter=',')
